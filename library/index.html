@@ -1,0 +1,203 @@
+<!--
+  # Onboarding Tutorial Demo
+  #
+  # In the <style /> tag, we have styling rules for the `.tutorial-modal` element. This element is both the dark gray overlay that covers the whole page during the tutorial
+  # and also the transparent box that highlights the current element being focused. To see how this actually works, change the background and box-shadow colors.
+  #
+  # In the rest of the HTML, to add an element to the tutorial flow simply add a `data-tut="{NUMBER}"` attribute, where NUMBER is the step # you want the element to appear.
+  # If you've set the tutorial step to a number that was already in the flow, the first element in the file with that line number will be the one that is shown in the tutorial.
+  # Alternatively you could just update the other elements so there are no overlapping numbers.
+-->
+​
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+            body {
+              height: 100vh;
+              width: 100vw;
+              background: rgb(255, 255, 255);
+            }
+      ​
+            .tutorial-modal {
+              display: none;
+              position: absolute;
+              background: transparent;
+              border: unset;
+              /* for IE */
+              box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3);
+              /* for real browsers */
+              box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.3);
+              pointer-events: none;
+              border-radius: 4px;​
+              transition: left 0.3s ease-in-out, top 0.3s ease-in-out,
+                width 0.3s ease-in-out, height 0.3s ease-in-out;
+            }
+      ​
+            .container {
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+      ​
+            img {
+              height: 150px;
+              margin: auto;
+            }
+      ​
+            nav {
+              background: rgb(42, 153, 187);
+              padding: 10px 5px;
+              margin-bottom: 10px;
+            }
+      ​
+            ul {
+              display: flex;
+              list-style: none;
+              padding: 0px;
+              margin: 0px 20px;
+              width: 230px;
+            }
+      ​
+            li {
+              margin-right: 25px;
+            }
+      ​
+            a {
+              text-decoration: none;
+              color: white;
+              font-size: 24px;
+            }
+      ​
+            .t1 {
+              font-size: 18px;
+              max-width: 400px;
+              text-align: center;
+              margin: 30px auto;
+            }
+      ​
+            .t2 {
+              text-align: right;
+              max-width: 700px;
+              margin-left: auto;
+              margin-right: 20px;
+            }
+      ​
+            .t3 {
+              font-size: 12px;
+              max-width: 600px;
+            }
+      ​
+            .flex {
+              width: 150px;
+              margin: auto;
+              padding: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+      ​
+            button + button {
+              margin-left: 10px;
+            }
+    </style>
+  </head>
+  <body>
+    <div class="tutorial-modal"></div>
+    ​
+    <nav>
+      <ul data-tut="1">
+        <li data-tut="2"><a href="#">Home</a></li>
+        <li data-tut="3"><a href="#">About</a></li>
+        <li><a href="#">Login</a></li>
+      </ul>
+    </nav>
+    ​
+    <div class="container">
+      <img
+        data-tut="4"
+        src="https://images.unsplash.com/photo-1606225457115-9b0de873c5db?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80"
+      />
+    </div>
+    ​
+    <p data-tut="8" class="t1">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod ipsa
+      temporibus, natus veritatis assumenda dolores nostrum dicta dolorem veniam
+      aspernatur? Fugiat blanditiis neque, assumenda ipsam fugit nulla
+      perferendis incidunt eaque.
+    </p>
+    <p data-tut="5" class="t2">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod ipsa
+      temporibus, natus veritatis assumenda dolores nostrum dicta dolorem veniam
+      aspernatur? Fugiat blanditiis neque, assumenda ipsam fugit nulla
+      perferendis incidunt eaque.
+    </p>
+    <p class="t3">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod ipsa
+      temporibus, natus veritatis assumenda dolores nostrum dicta dolorem veniam
+      aspernatur? Fugiat blanditiis neque, assumenda ipsam fugit nulla
+      perferendis incidunt eaque.
+    </p>
+    ​
+    <div class="flex" data-tut="7">
+      <button>Cancel</button>
+      <button data-tut="6">Submit</button>
+    </div>
+  </body>
+  <script>
+        let step = null;
+    ​
+        // when the window loads, listen for the user to start the tutorial by pressing `Enter`
+        window.addEventListener("keypress", (evnt) => {
+          let maxSteps = document.querySelectorAll("[data-tut]").length;
+    ​
+          if (evnt.key === "Enter") {
+            if (typeof step !== "number") {
+              step = 0;
+            } else {
+              step += 1;
+            }
+    ​
+            // if user is done with tutorial, remove highlight element
+            if (step >= maxSteps) {
+              console.log("tutorial is completed");
+    ​
+              const dialog = document.getElementsByClassName("tutorial-modal")[0];
+    ​
+              dialog.style.display = "none";
+              step = null;
+    ​
+              return null;
+            }
+    ​
+            // if user pressed enter, start the tutorial or move to next step if already started
+            handleTutorial();
+          }
+        });
+    ​
+        function handleTutorial() {
+          // get next tutorial step
+          const stepElement = document.querySelectorAll(
+            `[data-tut="${(step + 1).toString()}"]`
+          );
+    ​
+          // get dimensions of new tutorial step
+          const rect = stepElement[0].getBoundingClientRect();
+    ​
+          // get transparent "highlight" element
+          const dialog = document.getElementsByClassName("tutorial-modal")[0];
+    ​
+          // move highlight to location of new tutorial step (with padding)
+          dialog.style.display = "block";
+    ​
+          dialog.style.height = Math.ceil(rect.height) + 10 + "px";
+          dialog.style.width = Math.ceil(rect.width) + 15 + "px";
+          dialog.style.top = Math.ceil(rect.top) - 5 + "px";
+          dialog.style.left = Math.ceil(rect.left) - 0 + "px";
+        }
+  </script>
+</html>
